@@ -8,7 +8,13 @@ namespace Application.Mapping
     {
         public MappingProfile()
         {
+            // Domains to Dtos and reverse
             CreateMap<Homes, HomeDto>().ReverseMap();
+            CreateMap<Staffs, StaffDto>().ReverseMap();
+            CreateMap<Qualifications, QualDto>().ReverseMap();
+
+            // Command to Domains
+            CreateMap<Home.Edit.Command, Homes>();
         }
     }
 }

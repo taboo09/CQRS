@@ -39,23 +39,20 @@ namespace Application.Home
 
         public class Handler : IRequestHandler<Command, HomeDto>
         {
-            private readonly CareHomeContext _context;
             private readonly IMapper _mapper;
             private readonly IAppRepository<Homes> _appRepo;
 
-            public Handler(CareHomeContext context, IMapper mapper, IAppRepository<Homes> appRepo)
+            public Handler(IMapper mapper, IAppRepository<Homes> appRepo)
             {
-                _context = context;
                 _mapper = mapper;
                 _appRepo = appRepo;
             }
 
             public async Task<HomeDto> Handle(Command request, CancellationToken cancellationToken)
             {
-                if (await _context.Homes.AnyAsync(x => x.Name.ToLower() == request.Name.ToLower()))
+                if ((await _appRepo.Search(x => x.Name.ToUpper() == request.Name.ToUpper())) != null) 
                     throw new RestException(HttpStatusCode.BadRequest, new  { Name = "Care Home exists."} );
 
-                // add automapper
                 var newHomeDto = new HomeDto() 
                 {
                     Name = request.Name,
@@ -65,15 +62,9 @@ namespace Application.Home
                     Rating = request.Rating
                 };
 
-                // _context.Homes.Add(_mapper.Map<Homes>(newHomeDto));
-
-                // var saves = await _context.SaveChangesAsync();
-
                 _appRepo.Add(_mapper.Map<Homes>(newHomeDto));
 
                 if (await _appRepo.SaveAllAsync()) return newHomeDto;
-                
-                // if ( saves > 0) return newHomeDto;
 
                 throw new Exception("Problem saving new Care Home");
             }

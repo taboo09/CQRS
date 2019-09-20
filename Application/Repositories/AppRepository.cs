@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Domain;
 using Domain.Interfaces;
@@ -36,6 +38,11 @@ namespace Application.Repositories
         public void Delete(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
+        }
+
+        public async Task<T> Search(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbContext.Set<T>().FirstOrDefaultAsync(predicate);
         }
 
         public async Task<bool> SaveAllAsync()
